@@ -98,6 +98,19 @@ CREATE TABLE historial_salarios (
 ## SOLUCION 
 
 ```mysql
+DELIMITER //
+
+CREATE TRIGGER log_cambio_salario
+BEFORE UPDATE ON empleados
+FOR EACH ROW
+BEGIN
+    IF OLD.salario <> NEW.salario THEN
+        INSERT INTO historial_salarios (id_empleado, salario_anterior, salario_nuevo)
+        VALUES (OLD.id, OLD.salario, NEW.salario);
+    END IF;
+END //
+
+DELIMITER ;
 
 ```
 
