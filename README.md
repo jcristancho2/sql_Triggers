@@ -148,6 +148,17 @@ CREATE TABLE clientes_auditoria (
 ## SOLUCION 
 
 ```mysql
+DELIMITER //
+
+CREATE TRIGGER auditar_eliminacion_cliente
+AFTER DELETE ON clientes
+FOR EACH ROW
+BEGIN
+    INSERT INTO clientes_auditoria (id_cliente, nombre, email)
+    VALUES (OLD.id, OLD.nombre, OLD.email);
+END //
+
+DELIMITER ;
 
 ```
 
@@ -176,6 +187,19 @@ CREATE TABLE pedidos (
 ## SOLUCION 
 
 ```mysql
+DELIMITER //
+
+CREATE TRIGGER evitar_eliminacion_pendiente
+BEFORE DELETE ON pedidos
+FOR EACH ROW
+BEGIN
+    IF OLD.estado = 'pendiente' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No se pueden eliminar pedidos pendientes';
+    END IF;
+END //
+
+DELIMITER ;
 
 ```
 
